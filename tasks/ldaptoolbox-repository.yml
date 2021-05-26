@@ -1,0 +1,24 @@
+---
+# tasks file for ldaptoolbox
+
+- name: debian repository
+  block:
+
+  - name: import repository key
+    apt_key:
+      url: "{{ ldaptoolbox_apt_key_url }}"
+      id: "{{ ldaptoolbox_apt_key_id }}"
+      validate_certs: "{{ ldaptoolbox_validate_certs }}"
+      state: present
+  
+  - name: add repository
+    apt_repository:
+      repo: "{{ ldaptoolbox_apt_repo }}"
+      filename: "{{ ldaptoolbox_apt_repo_filename }}"
+      update_cache: yes
+      state: present
+    #ignore_errors: true
+
+  when:
+  - ansible_os_family == "Debian"
+

@@ -1,0 +1,11 @@
+---
+# handlers file for ldaptoolbox
+
+- name: configtest apache2
+  command: apachectl configtest
+
+- name: reload apache2
+  service:
+    name: apache2
+    state: reloaded
+

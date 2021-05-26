@@ -1,0 +1,49 @@
+---
+# tasks file for ldaptoolbox
+
+# Host preparation
+# ----------------
+
+- name: install ldaptoolbox repository
+  include_tasks: ldaptoolbox-repository.yml
+
+- name: deploy webapps
+  block:
+
+  - name: deploy Self-Service Password
+    include_tasks: ldaptoolbox-webapp.yml
+    loop: "{{ ldaptoolbox_ssp_deployment }}"
+    when:
+      - ldaptoolbox_ssp_enabled is true
+    tags:
+    - ssp
+    - deploy
+
+  - name: deploy Service Desk
+    include_tasks: ldaptoolbox-webapp.yml
+    loop: "{{ ldaptoolbox_servicedesk_deployment }}"
+    when:
+      - ldaptoolbox_servicedesk_enabled is true
+    tags:
+    - servicedesk
+    - deploy
+
+  - name: deploy White Pages
+    include_tasks: ldaptoolbox-webapp.yml
+    loop: "{{ ldaptoolbox_whitepages_deployment }}"
+    when:
+      - ldaptoolbox_whitepages_enabled is true
+    tags:
+    - whitepages
+    - deploy
+
+
+- name: deploy OpenLdap
+  include_tasks: ldaptoolbox-openldap.yml
+  loop: "{{ ldaptoolbox_openldap_deployment }}"
+  when:
+    - ldaptoolbox_openldap_enabled is true
+  tags:
+  - ssp
+  - deploy
+

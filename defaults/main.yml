@@ -1,0 +1,114 @@
+---
+# defaults file for ldaptoolbox
+
+# Common configuration
+# --------------------
+
+# APT configuration
+ldaptoolbox_apt_key_url: "https://ltb-project.org/lib/RPM-GPG-KEY-LTB-project"
+ldaptoolbox_apt_key_id: "3FC3FD92ABA3975D2BEB95A70AC51F926D45BFC5"
+ldaptoolbox_apt_repo: "deb [arch=amd64] https://ltb-project.org/debian/jessie jessie main"
+ldaptoolbox_apt_repo_filename: "ltb-project"
+ldaptoolbox_validate_certs: "false"
+
+
+# Webapps configuration
+# ---------------------
+
+# Webapps dependencies
+ldaptoolbox_webserver_dependencies:
+  - apache2
+  - libapache2-mod-php
+  - php-fpm
+  - php-ldap
+  - php-mbstring
+
+# Webserver modules
+ldaptoolbox_webserver_modules:
+  - ssl
+
+# Webapps installation
+ldaptoolbox_install_directory: "/usr/share"
+ldaptoolbox_webserver_name: "apache2"
+ldaptoolbox_webserver_directory: "/etc/apache2/"
+ldaptoolbox_webserver_user: "www-data"
+ldaptoolbox_webserver_group: "www-data"
+ldaptoolbox_proxy_fcgi_enabled: false
+
+# To access the private key
+ldaptoolbox_ssl_group: "ssl-cert"
+
+# Localization
+ldaptoolbox_lang: "en"
+ldaptoolbox_logo: "images/ltb-logo.png"
+ldaptoolbox_background: "images/unsplash-space.jpeg"
+
+
+# Self Service Password
+# ---------------------
+
+# Installation
+ldaptoolbox_ssp_enabled: false
+ldaptoolbox_ssp_debug: false
+ldaptoolbox_ssp_deployment:
+- name: self-service-password
+  # package installation
+  package_name: self-service-password
+  package_state: present
+  install_dir: "{{ ldaptoolbox_install_directory }}/self-service-password"
+  config_dir: "{{ ldaptoolbox_install_directory }}/self-service-password/conf"
+  owner: ssp
+  group: ssp
+  # virtual server configuration
+  server_port: 80
+  server_name: "{{ ansible_fqdn }}"
+  server_root: "{{ ldaptoolbox_install_directory }}/self-service-password"
+  server_loglevel: "debug"
+  ssl_server_port: 443
+  ssl_key: /etc/ssl/private/{{ ansible_fqdn }}.key
+  ssl_cert: /etc/ssl/certs/{{ ansible_fqdn }}.crt
+
+# Please refer to upstream documentation to learn more about the settings:
+# https://self-service-password.readthedocs.io/en/latest/
+
+# Environment
+ldaptoolbox_ssp_ldap_settings:
+  ldap_url: "'ldap://localhost'"
+  ldap_starttls: false
+  ldap_binddn: "'cn=manager,dc=example,dc=com'"
+  ldap_bindpw: "'secret'"
+  ldap_base: "'dc=example,dc=com'"
+  ldap_login_attribute: "'uid'"
+  ldap_fullname_attribute: "'cn'"
+  ldap_filter: "'(&(objectClass=person)($ldap_login_attribute={login}))'"
+ldaptoolbox_ssp_local_password_policy_settings: {}
+ldaptoolbox_ssp_mail_settings: {}
+ldaptoolbox_ssp_customization_settings: 
+  show_menu: true
+  lang: "{{ ldaptoolbox_lang }}"
+  logo: "{{ ldaptoolbox_logo }}"
+  background_image: "{{ ldaptoolbox_background }}"
+
+# Reset methods
+ldaptoolbox_ssp_reset_by_mail_settings: {}
+ldaptoolbox_ssp_reset_by_sms_settings: {}
+ldaptoolbox_ssp_reset_by_question_settings: {}
+
+# Additional settings
+ldaptoolbox_ssp_overrides:
+  keyphrase: "'mysupersecret'"
+
+
+# Service Desk
+# ------------
+
+# installation
+ldaptoolbox_servicedesk_enabled: false
+ldaptoolbox_servicedesk_deployment: []
+
+
+# White Pages
+# -----------
+
+ldaptoolbox_whitepages_enabled: false
+ldaptoolbox_whitepages_deployment: []

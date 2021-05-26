@@ -1,0 +1,96 @@
+---
+# tasks file for ldaptoolbox
+
+  # Dependencies
+
+  - name: install webserver dependencies
+    package:
+      name: "{{ ldaptoolbox_webserver_dependencies }}"
+      state: present
+
+  # Application
+
+  - name: install package
+    package:
+      name: "{{ item.package_name }}"
+      state: "{{ item.package_state }}"
+  
+  - name: add group
+    group:
+      name: "{{ item.group }}"
+      state: present
+
+  - name: add user
+    user:
+      name: "{{ item.owner }}"
+      group: "{{ item.group }}"
+      home: "{{ item.install_dir }}"
+      state: present
+
+  - name: fix ownership for web server
+    file:
+      path: "{{ item.install_dir }}"
+      owner: "{{ item.owner }}"
+      group: "{{ ldaptoolbox_webserver_group }}"
+      recurse: true
+      state: directory
+    # some files may belong to root because of chroot
+    ignore_errors: true
+
+  - name: configure application
+    template:
+      src: "usr/share/{{ item.name }}/conf/config.inc.local.php"
+      dest: "{{ item.config_dir }}/config.inc.local.php"
+      owner: "{{ item.owner }}"
+      group: "{{ ldaptoolbox_webserver_group }}"
+      mode: 0640
+
+  - name: copy logo
+    copy:
+      src: "files/{{ ldaptoolbox_logo }}"
+      dest: "{{ item.install_dir }}/{{ ldaptoolbox_logo }}"
+      owner: "{{ item.owner }}"
+      group: "{{ ldaptoolbox_webserver_group }}"
+      mode: 0644
+    when: ldaptoolbox_logo is defined
+
+  # Web server
+
+  - name: allow webserver to read host's private key
+    user:
+      name: "{{ ldaptoolbox_webserver_user }}"
+      groups: "{{ ldaptoolbox_ssl_group }}"
+      append: yes
+    when: ldaptoolbox_ssl_group is defined
+    tags:
+      - apache
+
+  - name: enable required webserver modules
+    command: "a2enmod {{ item }}"
+    loop: "{{ ldaptoolbox_webserver_modules }}"
+    notify: reload apache2
+    when:
+      - ldaptoolbox_webserver_modules | length > 0
+    tags:
+      - apache
+  
+  - name: configure vhost
+    template:
+      src: "etc/apache2/sites-available/{{ item.name }}.conf"
+      dest: "/etc/apache2/sites-available/{{ item.name }}.conf"
+      owner: "root"
+      group: "root"
+      mode: 0640
+    notify:
+      - configtest apache2
+      - reload apache2
+    tags:
+      - apache
+
+  - name: enable vhost
+    command: "a2ensite {{ item.name }}"
+    notify: reload apache2
+    tags:
+      - apache
+
+
