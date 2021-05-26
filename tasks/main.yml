@@ -40,7 +40,6 @@
 
 - name: deploy OpenLdap
   include_tasks: ldaptoolbox-openldap.yml
-  loop: "{{ ldaptoolbox_openldap_deployment }}"
   when:
     - ldaptoolbox_openldap_enabled is true
   tags:
