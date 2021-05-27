@@ -11,6 +11,25 @@ ldaptoolbox_apt_repo: "deb [arch=amd64] https://ltb-project.org/debian/jessie je
 ldaptoolbox_apt_repo_filename: "ltb-project"
 ldaptoolbox_validate_certs: "false"
 
+# OpenLdap
+# --------
+
+ldaptoolbox_openldap_package_name: openldap-ltb
+ldaptoolbox_openldap_package_state: present
+ldaptoolbox_openldap_package_extralist:
+- openldap-ltb-mdb-utils
+- openldap-ltb-contrib-overlays
+- openldap-ltb-ppm
+
+# To access the private key
+ldaptoolbox_openldap_user: "ldap"
+ldaptoolbox_openldap_group: "ldap"
+ldaptoolbox_openldap_ssl_group: "ssl-cert"
+
+# To enable SASL
+ldaptoolbox_openldap_sasl_enabled: true
+ldaptoolbox_openldap_sasl_package_name: sasl2-bin
+
 
 # Webapps configuration
 # ---------------------

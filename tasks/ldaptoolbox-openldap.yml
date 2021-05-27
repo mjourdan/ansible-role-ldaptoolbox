@@ -1,0 +1,65 @@
+---
+# tasks file for ldaptoolbox
+
+  # Installation
+
+  - name: install openldap package
+    package:
+      name: "{{ ldaptoolbox_openldap_package_name }}"
+      state: "{{ ldaptoolbox_openldap_package_state }}"
+    # debian package will try to start slapd even though we get this error:
+    # "[ALERT] OpenLDAP configuration test failed"
+    ignore_errors: true
+
+  - name: allow openldap to read host's private key
+    user:
+      name: "{{ ldaptoolbox_openldap_user }}"
+      groups: "{{ ldaptoolbox_openldap_ssl_group }}"
+      append: yes
+    when: ldaptoolbox_openldap_ssl_group is defined
+    tags:
+      - apache
+
+
+  # Additional Stuff
+
+  - name: install additional packages
+    package:
+      name: "{{ ldaptoolbox_openldap_package_extralist }}"
+      state: "{{ ldaptoolbox_openldap_package_state }}"
+    # debian package will try to start slapd even though we get this error:
+    # "[ALERT] OpenLDAP configuration test failed"
+    ignore_errors: true
+    when: ldaptoolbox_openldap_package_extralist is defined
+
+
+  # SASL
+
+  - name: SASL
+    block:
+
+    - name: install sasl package
+      package:
+        name: "{{ ldaptoolbox_openldap_sasl_package_name }}"
+        state: "{{ ldaptoolbox_openldap_package_state }}"
+
+    - name: configure /etc/default/saslauthd
+      lineinfile:
+        path: /etc/defaults
+        line: "{{ item.line }}"
+        regexp: "{{ item.regexp }}"
+        state: present
+        backup: yes
+      with_items:
+        - line: 'START=yes'
+          regexp: '^START=.*'
+        - line: 'NAME="saslauthd"'
+          regexp: '^NAME=.*'
+        - line: 'MECHANISMS="ldap"'
+          regexp: '^MECHANISMS=.*'
+ 
+    #TODO: configure /etc/saslauthd.conf
+
+    when: ldaptoolbox_openldap_sasl_enabled
+    tags:
+    - sasl
