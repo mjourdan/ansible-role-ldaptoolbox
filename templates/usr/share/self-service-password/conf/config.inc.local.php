@@ -50,11 +50,18 @@ ${{ key }} = "{{ value }}";
 {% endfor %}
 
 
-# Additional overrides
-# --------------------
+# Additional settings
+# -------------------
 
-{% for key, value in ldaptoolbox_ssp_overrides.items() %}
+# Recaptcha
+{% for key, value in ldaptoolbox_ssp_recaptcha_settings.items() %}
 ${{ key }} = "{{ value }}";
+{% endfor %}
+
+# Additional overrides
+# No quotation marks arround values to allow the use of variables, like for reset_url
+{% for key, value in ldaptoolbox_ssp_overrides.items() %}
+${{ key }} = {{ value }};
 {% endfor %}
 
 

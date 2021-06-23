@@ -114,6 +114,7 @@ ldaptoolbox_ssp_reset_by_sms_settings: {}
 ldaptoolbox_ssp_reset_by_question_settings: {}
 
 # Additional settings
+ldaptoolbox_ssp_recaptcha_settings: {}
 ldaptoolbox_ssp_overrides:
   keyphrase: "'mysupersecret'"
 
