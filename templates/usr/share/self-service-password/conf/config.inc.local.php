@@ -53,7 +53,7 @@ ${{ key }} = {{ value }};
 # Additional overrides
 # --------------------
 
-{% for key, value in ldaptoolbox_ssp_mail_settings.items() %}
+{% for key, value in ldaptoolbox_ssp_overrides.items() %}
 ${{ key }} = {{ value }};
 {% endfor %}
 
